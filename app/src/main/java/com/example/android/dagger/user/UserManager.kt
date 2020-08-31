@@ -20,7 +20,6 @@ import com.example.android.dagger.storage.Storage
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 private const val REGISTERED_USER = "registered_user"
 private const val PASSWORD_SUFFIX = "password"
 
@@ -30,19 +29,20 @@ private const val PASSWORD_SUFFIX = "password"
  */
 
 @Singleton
-class UserManager @Inject constructor(private val storage: Storage) {
+class UserManager @Inject constructor(private val storage: Storage, private val userComponentFactory: UserComponent.Factory) {
 
     /**
      *  UserDataRepository is specific to a logged in user. This determines if the user
      *  is logged in or not, when the user logs in, a new instance will be created.
      *  When the user logs out, this will be null.
      */
-    var userDataRepository: UserDataRepository? = null
-
     val username: String
         get() = storage.getString(REGISTERED_USER)
 
-    fun isUserLoggedIn() = userDataRepository != null
+    var userComponent: UserComponent? = null
+        private set
+
+    fun isUserLoggedIn() = userComponent != null
 
     fun isUserRegistered() = storage.getString(REGISTERED_USER).isNotEmpty()
 
@@ -64,7 +64,7 @@ class UserManager @Inject constructor(private val storage: Storage) {
     }
 
     fun logout() {
-        userDataRepository = null
+        userComponent = null
     }
 
     fun unregister() {
@@ -75,6 +75,6 @@ class UserManager @Inject constructor(private val storage: Storage) {
     }
 
     private fun userJustLoggedIn() {
-        userDataRepository = UserDataRepository(this)
+        userComponent = userComponentFactory.create()
     }
 }
