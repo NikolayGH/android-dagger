@@ -25,4 +25,8 @@ open class MyApplication : Application() {
     val appComponent: AppComponent by lazy{
         DaggerAppComponent.factory().create(applicationContext)
     }
+
+    open fun initializeComponent(): AppComponent {
+        return DaggerAppComponent.factory().create(applicationContext)
+    }
 }
